@@ -1,4 +1,4 @@
-module github.com/cosmos/sdk-tutorials/nameservice
+module github.com/cosmos/sdk-tutorials/factio
 
 go 1.13
 

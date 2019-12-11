@@ -2,13 +2,13 @@ package keeper
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/sdk-tutorials/nameservice/x/nameservice/internal/types"
+	"github.com/cosmos/sdk-tutorials/factio/x/factio/internal/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-// query endpoints supported by the nameservice Querier
+// query endpoints supported by the factio Querier
 const (
 	QueryResolve = "resolve"
 	QueryWhois   = "whois"
@@ -26,7 +26,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		case QueryNames:
 			return queryNames(ctx, req, keeper)
 		default:
-			return nil, sdk.ErrUnknownRequest("unknown nameservice query endpoint")
+			return nil, sdk.ErrUnknownRequest("unknown factio query endpoint")
 		}
 	}
 }
