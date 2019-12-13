@@ -1,30 +1,32 @@
 package factio
 
 import (
+	"bytes"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/sdk-tutorials/factio/x/factio/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 type GenesisState struct {
-	WhoisRecords []Whois `json:"whois_records"`
+	FactRecords []Fact `json:"whois_records"`
 }
 
-func NewGenesisState(whoIsRecords []Whois) GenesisState {
-	return GenesisState{WhoisRecords: nil}
+func NewGenesisState(whoIsRecords []Fact) GenesisState {
+	return GenesisState{FactRecords: nil}
 }
 
 func ValidateGenesis(data GenesisState) error {
-	for _, record := range data.WhoisRecords {
-		if record.Owner == nil {
-			return fmt.Errorf("invalid WhoisRecord: Value: %s. Error: Missing Owner", record.Value)
+	for _, record := range data.FactRecords {
+		if record.Creator == nil {
+			return fmt.Errorf("invalid WhoisRecord: Value: . Error: Missing Owner")
 		}
-		if record.Value == "" {
-			return fmt.Errorf("invalid WhoisRecord: Owner: %s. Error: Missing Value", record.Owner)
+		if record.Description == "" {
+			return fmt.Errorf("invalid WhoisRecord: Owner: . Error: Missing Value")
 		}
 		if record.Price == nil {
-			return fmt.Errorf("invalid WhoisRecord: Value: %s. Error: Missing Price", record.Value)
+			return fmt.Errorf("invalid WhoisRecord: Value: . Error: Missing Price")
 		}
 	}
 	return nil
@@ -32,26 +34,27 @@ func ValidateGenesis(data GenesisState) error {
 
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
-		WhoisRecords: []Whois{},
+		FactRecords: []Fact{},
 	}
 }
 
 func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) []abci.ValidatorUpdate {
-	for _, record := range data.WhoisRecords {
-		keeper.SetWhois(ctx, record.Value, record)
+	for _, record := range data.FactRecords {
+		keeper.SetFact(ctx, record)
 	}
 	return []abci.ValidatorUpdate{}
 }
 
 func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
-	var records []Whois
-	iterator := k.GetNamesIterator(ctx)
+	var records []Fact
+	iterator := k.GetFactIterator(ctx)
 	for ; iterator.Valid(); iterator.Next() {
 
-		name := string(iterator.Key())
-		whois := k.GetWhois(ctx, name)
-		records = append(records, whois)
+		// titlewithprefix := string(iterator.Key())
+		title := bytes.Trim(iterator.Key(), string(types.FactKey))
+		fact := k.GetFact(ctx, string(title))
+		records = append(records, fact)
 
 	}
-	return GenesisState{WhoisRecords: records}
+	return GenesisState{FactRecords: records}
 }

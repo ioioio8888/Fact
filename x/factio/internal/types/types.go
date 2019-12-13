@@ -1,32 +1,42 @@
 package types
 
 import (
-	"fmt"
-	"strings"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// MinNamePrice is Initial Starting Price for a name that was never previously owned
-var MinNamePrice = sdk.Coins{sdk.NewInt64Coin("nametoken", 1)}
+// MinPrice is 1 facttoken
+var MinPrice = sdk.Coins{sdk.NewInt64Coin("facttoken", 1)}
 
-// Whois is a struct that contains all the metadata of a name
-type Whois struct {
-	Value string         `json:"value"`
-	Owner sdk.AccAddress `json:"owner"`
-	Price sdk.Coins      `json:"price"`
+//Fact struct
+type Fact struct {
+	Title       string           `json:"title"`
+	Time        int64            `json:"time"`
+	Place       string           `json:"place"`
+	Description string           `json:"description"`
+	Creator     sdk.AccAddress   `json:"creator"`
+	Price       sdk.Coins        `json:"price"`
+	Stakers     []sdk.AccAddress `json:"stakers"`
 }
 
-// NewWhois returns a new Whois with the minprice as the price
-func NewWhois() Whois {
-	return Whois{
-		Price: MinNamePrice,
+// NewFact returns a new Fact
+func NewFact() Fact {
+	return Fact{
+		Price: MinPrice,
 	}
 }
 
-// implement fmt.Stringer
-func (w Whois) String() string {
-	return strings.TrimSpace(fmt.Sprintf(`Owner: %s
-Value: %s
-Price: %s`, w.Owner, w.Value, w.Price))
+//Fact Check Delegation struct
+type FactCheckDelegation struct {
+	DelegatorAddress sdk.AccAddress `json:"delegator_address"`
+	Title            string         `json:"title"`
+	Shares           sdk.Dec        `json:"shares"`
+}
+
+// NewDelegation creates a new delegation object
+func NewDelegation(delegatorAddr sdk.AccAddress, title string, shares sdk.Dec) FactCheckDelegation {
+	return FactCheckDelegation{
+		DelegatorAddress: delegatorAddr,
+		Title:            title,
+		Shares:           shares,
+	}
 }
