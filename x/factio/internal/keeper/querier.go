@@ -1,8 +1,9 @@
 package keeper
 
 import (
+	"bytes"
 	"encoding/json"
-	"github.com/cosmos/sdk-tutorials/factio/x/factio/internal/types"
+	"github.com/ioioio8888/factio/x/factio/internal/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -25,8 +26,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		case QueryAddressDelegation:
 			return queryAddressDelegation(ctx, path[1:], req, keeper)
 		case QueryFactList:
-			// return queryFactList(ctx, req, keeper)
-			return
+			return queryFactList(ctx, req, keeper)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown factio query endpoint")
 		}
@@ -74,14 +74,11 @@ func queryAddressDelegation(ctx sdk.Context, path []string, req abci.RequestQuer
 // return a list of title of all facts
 func queryFactList(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var factList types.QueryResFactList
-	var fact types.Fact
 	iterator := keeper.GetFactIterator(ctx)
 
 	for ; iterator.Valid(); iterator.Next() {
-		if err := json.Unmarshal(iterator.Value(), &fact); err != nil {
-			panic(err)
-		}
-		factList = append(factList, fact.Title)
+		title := bytes.Trim(iterator.Key(), string(types.FactKey))
+		factList = append(factList, string(title))
 	}
 
 	res, err := codec.MarshalJSONIndent(keeper.cdc, factList)

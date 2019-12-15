@@ -9,8 +9,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/sdk-tutorials/factio/x/factio/client/cli"
-	"github.com/cosmos/sdk-tutorials/factio/x/factio/client/rest"
+	"github.com/ioioio8888/factio/x/factio/client/cli"
+	"github.com/ioioio8888/factio/x/factio/client/rest"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"

@@ -4,7 +4,7 @@ package rest
 // 	"net/http"
 
 // 	"github.com/cosmos/cosmos-sdk/client/context"
-// 	"github.com/cosmos/sdk-tutorials/factio/x/factio/internal/types"
+// 	"github.com/ioioio8888/factio/x/factio/internal/types"
 
 // 	sdk "github.com/cosmos/cosmos-sdk/types"
 // 	"github.com/cosmos/cosmos-sdk/types/rest"

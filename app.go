@@ -25,7 +25,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 
-	"github.com/cosmos/sdk-tutorials/factio/x/factio"
+	"github.com/ioioio8888/factio/x/factio"
 )
 
 const appName = "factio"

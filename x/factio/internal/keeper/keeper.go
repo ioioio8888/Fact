@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/sdk-tutorials/factio/x/factio/internal/types"
+	"github.com/ioioio8888/factio/x/factio/internal/types"
 )
 
 // Keeper maintains the link to storage and exposes getter/setter methods for the various parts of the state machine
@@ -118,4 +118,32 @@ func (k Keeper) GetFactDelegationIterator(ctx sdk.Context, delegator string) sdk
 	store := ctx.KVStore(k.storeKey)
 	prefix := append(types.FactDelegateKey, delegator...)
 	return sdk.KVStorePrefixIterator(store, prefix)
+}
+
+// SetEventStaker - sets the current owner of an event
+func (k Keeper) SetFactDelegators(ctx sdk.Context, title string, delegator sdk.AccAddress, stakeType string) {
+	Fact := k.GetFact(ctx, title)
+	if stakeType == "stake" {
+		Fact.Delegators = append(Fact.Delegators, delegator)
+
+	} else if stakeType == "unstake" {
+		Fact.Delegators = RemoveIndex(Fact.Delegators, delegator)
+	}
+	k.SetFact(ctx, Fact)
+}
+
+//find the index of the address from the list
+func indexOf(element sdk.AccAddress, data []sdk.AccAddress) int {
+	for k, v := range data {
+		if element.Equals(v) {
+			return k
+		}
+	}
+	return -1 //not found.
+}
+
+//remove the address from the list of address
+func RemoveIndex(s []sdk.AccAddress, staker sdk.AccAddress) []sdk.AccAddress {
+	index := indexOf(staker, s)
+	return append(s[:index], s[index+1:]...)
 }

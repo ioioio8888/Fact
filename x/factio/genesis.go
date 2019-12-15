@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/sdk-tutorials/factio/x/factio/internal/types"
+	"github.com/ioioio8888/factio/x/factio/internal/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 

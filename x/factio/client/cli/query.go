@@ -6,7 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/sdk-tutorials/factio/x/factio/internal/types"
+	"github.com/ioioio8888/factio/x/factio/internal/types"
 	"github.com/spf13/cobra"
 )
 
@@ -86,7 +86,6 @@ func GetCmdGetFactList(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				fmt.Printf("Error: %s", err)
 				return nil
 			}
-
 			var out types.QueryResFactList
 			cdc.MustUnmarshalJSON(res, &out)
 			return cliCtx.PrintOutput(out)

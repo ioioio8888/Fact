@@ -3,7 +3,7 @@ package factio
 import (
 	"fmt"
 
-	"github.com/cosmos/sdk-tutorials/factio/x/factio/internal/types"
+	"github.com/ioioio8888/factio/x/factio/internal/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -71,7 +71,7 @@ func handleMsgEditFact(ctx sdk.Context, keeper Keeper, msg types.MsgEditFact) sd
 // Handle a message to delegate Fact
 func handleMsgDelegateFact(ctx sdk.Context, keeper Keeper, msg types.MsgDelegateFact) sdk.Result {
 
-	if !keeper.HasFactDelegation(ctx, msg.Title, msg.Delegator) {
+	if keeper.HasFactDelegation(ctx, msg.Title, msg.Delegator) {
 		return sdk.ErrInvalidAddress("This address has already delegated on this fact").Result()
 	}
 	fcoin, _ := sdk.ParseCoins("1factcoin")
@@ -91,7 +91,7 @@ func handleMsgDelegateFact(ctx sdk.Context, keeper Keeper, msg types.MsgDelegate
 	factdelegation.Shares = factdelegation.Shares.Add(fcoin)
 	keeper.SetFactDelegation(ctx, factdelegation)
 
-	//get the fact and add the delegator to the list in fact
+	// get the fact and add the delegator to the list in fact
 	fact := keeper.GetFact(ctx, msg.Title)
 	fact.Delegators = append(fact.Delegators, msg.Delegator)
 	keeper.SetFact(ctx, fact)
@@ -118,7 +118,7 @@ func RemoveIndex(s []sdk.AccAddress, staker sdk.AccAddress) []sdk.AccAddress {
 // Handle a message to delegate Fact
 func handleMsgUnDelegateFact(ctx sdk.Context, keeper Keeper, msg types.MsgUnDelegateFact) sdk.Result {
 
-	if keeper.HasFactDelegation(ctx, msg.Title, msg.Delegator) {
+	if !keeper.HasFactDelegation(ctx, msg.Title, msg.Delegator) {
 		return sdk.ErrInvalidAddress("This address hasn't delegated on this fact").Result()
 	}
 	dfcoin, _ := sdk.ParseCoins("1delegatedfactcoin")

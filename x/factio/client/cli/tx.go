@@ -1,8 +1,9 @@
 package cli
 
 import (
-	"github.com/spf13/cobra"
 	"strconv"
+
+	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
@@ -10,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/cosmos/sdk-tutorials/factio/x/factio/internal/types"
+	"github.com/ioioio8888/factio/x/factio/internal/types"
 )
 
 func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
@@ -100,12 +101,8 @@ func GetCmdDelegateFact(cdc *codec.Codec) *cobra.Command {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			coins, err := sdk.ParseCoins("1factcoin")
-			if err != nil {
-				return err
-			}
-			msg := types.NewMsgDelegateFact(args[0], cliCtx.GetFromAddress(), coins)
-			err = msg.ValidateBasic()
+			msg := types.NewMsgDelegateFact(args[0], cliCtx.GetFromAddress())
+			err := msg.ValidateBasic()
 			if err != nil {
 				return err
 			}
@@ -125,13 +122,8 @@ func GetCmdUnDelegateFact(cdc *codec.Codec) *cobra.Command {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-
-			coins, err := sdk.ParseCoins("1factcoin")
-			if err != nil {
-				return err
-			}
-			msg := types.NewMsgUnDelegateFact(args[0], cliCtx.GetFromAddress(), coins)
-			err = msg.ValidateBasic()
+			msg := types.NewMsgUnDelegateFact(args[0], cliCtx.GetFromAddress())
+			err := msg.ValidateBasic()
 			if err != nil {
 				return err
 			}
@@ -140,26 +132,3 @@ func GetCmdUnDelegateFact(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 }
-
-// // GetCmdDeleteName is the CLI command for sending a DeleteName transaction
-// func GetCmdDeleteName(cdc *codec.Codec) *cobra.Command {
-// 	return &cobra.Command{
-// 		Use:   "delete-name [name]",
-// 		Short: "delete the name that you own along with it's associated fields",
-// 		Args:  cobra.ExactArgs(1),
-// 		RunE: func(cmd *cobra.Command, args []string) error {
-// 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-// 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-
-// 			msg := types.NewMsgDeleteName(args[0], cliCtx.GetFromAddress())
-// 			err := msg.ValidateBasic()
-// 			if err != nil {
-// 				return err
-// 			}
-
-// 			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
-// 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
-// 		},
-// 	}
-// }

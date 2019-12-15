@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-// MinPrice is 1 facttoken
-var MinPrice = sdk.Coins{sdk.NewInt64Coin("facttoken", 1)}
+// MinPrice is 1 factcoin
+var MinPrice = sdk.Coins{sdk.NewInt64Coin("factcoin", 1)}
 
 //Fact struct
 type Fact struct {

@@ -1,4 +1,4 @@
-module github.com/cosmos/sdk-tutorials/factio
+module github.com/ioioio8888/factio
 
 go 1.13
 

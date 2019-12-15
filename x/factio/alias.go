@@ -1,8 +1,8 @@
 package factio
 
 import (
-	"github.com/cosmos/sdk-tutorials/factio/x/factio/internal/keeper"
-	"github.com/cosmos/sdk-tutorials/factio/x/factio/internal/types"
+	"github.com/ioioio8888/factio/x/factio/internal/keeper"
+	"github.com/ioioio8888/factio/x/factio/internal/types"
 )
 
 const (
