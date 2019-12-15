@@ -193,8 +193,8 @@ type MsgUnDelegateFact struct {
 }
 
 // NewMsgDelegateFact is a constructor function for MsgDelegateFact
-func NewMsgUnDelegateFact(title string, Delegator sdk.AccAddress) MsgDelegateFact {
-	return MsgDelegateFact{
+func NewMsgUnDelegateFact(title string, Delegator sdk.AccAddress) MsgUnDelegateFact {
+	return MsgUnDelegateFact{
 		Title:     title,
 		Delegator: Delegator,
 		// Amount:    amount,
