@@ -84,7 +84,7 @@ type MsgEditFact struct {
 }
 
 // NewMsgEditFact is a constructor function for MsgEditFact
-func NewMsgEditFact(title string, editor sdk.AccAddress, bid sdk.Coins, time int64, place string, description string) MsgEditFact {
+func NewMsgEditFact(title string, editor sdk.AccAddress, time int64, place string, description string) MsgEditFact {
 	return MsgEditFact{
 		Title:       title,
 		Editor:      editor,

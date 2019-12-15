@@ -20,25 +20,25 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	}
 	factioQueryCmd.AddCommand(client.GetCommands(
 		GetCmdGetFact(storeKey, cdc),
-	// GetCmdWhois(storeKey, cdc),
-	// GetCmdNames(storeKey, cdc),
+		GetCmdGetAddressDelegation(storeKey, cdc),
+		GetCmdGetFactList(storeKey, cdc),
 	)...)
 	return factioQueryCmd
 }
 
-// GetCmdResolveName queries information about a name
+// GetCmdGetFact queries information about a name
 func GetCmdGetFact(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
-		Use:   "fact [title]",
-		Short: "fact title",
+		Use:   "get-fact [title]",
+		Short: "get-fact title",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			name := args[0]
+			title := args[0]
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/getFact/%s", queryRoute, name), nil)
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/getFact/%s", queryRoute, title), nil)
 			if err != nil {
-				fmt.Printf("could not get the title - %s \n", name)
+				fmt.Printf("could not get the title - %s \n", title)
 				return nil
 			}
 
@@ -49,47 +49,47 @@ func GetCmdGetFact(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-// // GetCmdWhois queries information about a domain
-// func GetCmdWhois(queryRoute string, cdc *codec.Codec) *cobra.Command {
-// 	return &cobra.Command{
-// 		Use:   "whois [name]",
-// 		Short: "Query whois info of name",
-// 		Args:  cobra.ExactArgs(1),
-// 		RunE: func(cmd *cobra.Command, args []string) error {
-// 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-// 			name := args[0]
+// GetCmdGetAddressdelegation queries a list of fact that the address has been delegated to
+func GetCmdGetAddressDelegation(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "get-addrdele [address]",
+		Short: "get-addrdele address",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			address := args[0]
 
-// 			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/whois/%s", queryRoute, name), nil)
-// 			if err != nil {
-// 				fmt.Printf("could not resolve whois - %s \n", name)
-// 				return nil
-// 			}
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/getAddressDelegation/%s", queryRoute, address), nil)
+			if err != nil {
+				fmt.Printf("could not get the title - %s \n", address)
+				return nil
+			}
 
-// 			var out types.Whois
-// 			cdc.MustUnmarshalJSON(res, &out)
-// 			return cliCtx.PrintOutput(out)
-// 		},
-// 	}
-// }
+			var out types.QueryResFactDelegationList
+			cdc.MustUnmarshalJSON(res, &out)
+			return cliCtx.PrintOutput(out)
+		},
+	}
+}
 
-// // GetCmdNames queries a list of all names
-// func GetCmdNames(queryRoute string, cdc *codec.Codec) *cobra.Command {
-// 	return &cobra.Command{
-// 		Use:   "names",
-// 		Short: "names",
-// 		// Args:  cobra.ExactArgs(1),
-// 		RunE: func(cmd *cobra.Command, args []string) error {
-// 			cliCtx := context.NewCLIContext().WithCodec(cdc)
+// GetCmdGetFactList queries a list of fact
+func GetCmdGetFactList(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "get-factlist",
+		Short: "get-factlist",
+		Args:  cobra.ExactArgs(0),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-// 			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/names", queryRoute), nil)
-// 			if err != nil {
-// 				fmt.Printf("could not get query names\n")
-// 				return nil
-// 			}
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/getFactList", queryRoute), nil)
+			if err != nil {
+				fmt.Printf("Error: %s", err)
+				return nil
+			}
 
-// 			var out types.QueryResNames
-// 			cdc.MustUnmarshalJSON(res, &out)
-// 			return cliCtx.PrintOutput(out)
-// 		},
-// 	}
-// }
+			var out types.QueryResFactList
+			cdc.MustUnmarshalJSON(res, &out)
+			return cliCtx.PrintOutput(out)
+		},
+	}
+}

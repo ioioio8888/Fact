@@ -2,13 +2,14 @@ package cli
 
 import (
 	"github.com/spf13/cobra"
+	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	// "github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
-	// sdk "github.com/cosmos/cosmos-sdk/types"
-	// "github.com/cosmos/cosmos-sdk/x/auth"
-	// "github.com/cosmos/cosmos-sdk/x/auth/client/utils"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/cosmos/sdk-tutorials/factio/x/factio/internal/types"
 )
 
@@ -22,67 +23,123 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	}
 
 	factioTxCmd.AddCommand(client.PostCommands(
-	// GetCmdBuyName(cdc),
-	// GetCmdSetName(cdc),
-	// GetCmdDeleteName(cdc),
+		GetCmdCreateFact(cdc),
+		GetCmdEditFact(cdc),
+		GetCmdDelegateFact(cdc),
+		GetCmdUnDelegateFact(cdc),
 	)...)
 
 	return factioTxCmd
 }
 
-// // GetCmdBuyName is the CLI command for sending a BuyName transaction
-// func GetCmdBuyName(cdc *codec.Codec) *cobra.Command {
-// 	return &cobra.Command{
-// 		Use:   "buy-name [name] [amount]",
-// 		Short: "bid for existing name or claim new name",
-// 		Args:  cobra.ExactArgs(2),
-// 		RunE: func(cmd *cobra.Command, args []string) error {
-// 			cliCtx := context.NewCLIContext().WithCodec(cdc)
+// GetCmdCreateFact is the CLI command for sending a CreateFact transaction
+func GetCmdCreateFact(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "create-fact [title] [time] [place] [description]",
+		Short: "create a new fact if it is not exist",
+		Args:  cobra.ExactArgs(4),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-// 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 
-// 			coins, err := sdk.ParseCoins(args[1])
-// 			if err != nil {
-// 				return err
-// 			}
+			time, terr := strconv.ParseInt(args[1], 10, 64)
+			if terr != nil {
+				return terr
+			}
 
-// 			msg := types.NewMsgBuyName(args[0], coins, cliCtx.GetFromAddress())
-// 			err = msg.ValidateBasic()
-// 			if err != nil {
-// 				return err
-// 			}
+			coins, err := sdk.ParseCoins("1factcoin")
+			if err != nil {
+				return err
+			}
 
-// 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
-// 		},
-// 	}
-// }
+			msg := types.NewMsgCreateFact(args[0], cliCtx.GetFromAddress(), coins, time, args[2], args[3])
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
 
-// // GetCmdSetName is the CLI command for sending a SetName transaction
-// func GetCmdSetName(cdc *codec.Codec) *cobra.Command {
-// 	return &cobra.Command{
-// 		Use:   "set-name [name] [value]",
-// 		Short: "set the value associated with a name that you own",
-// 		Args:  cobra.ExactArgs(2),
-// 		RunE: func(cmd *cobra.Command, args []string) error {
-// 			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
 
-// 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+// GetCmdEditFact is the CLI command for sending a EditFact transaction
+func GetCmdEditFact(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "edit-fact [title] [time] [place] [description]",
+		Short: "set the content of a fact that you own",
+		Args:  cobra.ExactArgs(4),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-// 			// if err := cliCtx.EnsureAccountExists(); err != nil {
-// 			// 	return err
-// 			// }
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			time, err := strconv.ParseInt(args[1], 10, 64)
+			if err != nil {
+				return err
+			}
+			msg := types.NewMsgEditFact(args[0], cliCtx.GetFromAddress(), time, args[2], args[3])
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
 
-// 			msg := types.NewMsgSetName(args[0], args[1], cliCtx.GetFromAddress())
-// 			err := msg.ValidateBasic()
-// 			if err != nil {
-// 				return err
-// 			}
+// GetCmdDelegateFact is the CLI command for sending a DelegateFact transaction
+func GetCmdDelegateFact(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "delegate-fact [title]",
+		Short: "delegate on a fact",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-// 			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
-// 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
-// 		},
-// 	}
-// }
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			coins, err := sdk.ParseCoins("1factcoin")
+			if err != nil {
+				return err
+			}
+			msg := types.NewMsgDelegateFact(args[0], cliCtx.GetFromAddress(), coins)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
+
+// GetCmdUnDelegateFact is the CLI command for sending a UnDelegateFact transaction
+func GetCmdUnDelegateFact(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "undelegate-fact [title]",
+		Short: "undelegate on a fact",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+
+			coins, err := sdk.ParseCoins("1factcoin")
+			if err != nil {
+				return err
+			}
+			msg := types.NewMsgUnDelegateFact(args[0], cliCtx.GetFromAddress(), coins)
+			err = msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
 
 // // GetCmdDeleteName is the CLI command for sending a DeleteName transaction
 // func GetCmdDeleteName(cdc *codec.Codec) *cobra.Command {
