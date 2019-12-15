@@ -61,7 +61,7 @@ func GetCmdGetAddressDelegation(queryRoute string, cdc *codec.Codec) *cobra.Comm
 
 			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/getAddressDelegation/%s", queryRoute, address), nil)
 			if err != nil {
-				fmt.Printf("could not get the title - %s \n", err)
+				fmt.Printf("could not get the address - %s \n", err)
 				return nil
 			}
 

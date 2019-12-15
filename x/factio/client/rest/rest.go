@@ -1,6 +1,8 @@
 package rest
 
 import (
+	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/client/context"
 
 	"github.com/gorilla/mux"
@@ -12,10 +14,13 @@ const (
 
 // RegisterRoutes - Central function to define routes that get registered by the main application
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string) {
-	// r.HandleFunc(fmt.Sprintf("/%s/names", storeName), namesHandler(cliCtx, storeName)).Methods("GET")
-	// r.HandleFunc(fmt.Sprintf("/%s/names", storeName), buyNameHandler(cliCtx)).Methods("POST")
-	// r.HandleFunc(fmt.Sprintf("/%s/names", storeName), setNameHandler(cliCtx)).Methods("PUT")
-	// r.HandleFunc(fmt.Sprintf("/%s/names/{%s}", storeName, restName), resolveNameHandler(cliCtx, storeName)).Methods("GET")
-	// r.HandleFunc(fmt.Sprintf("/%s/names/{%s}/whois", storeName, restName), whoIsHandler(cliCtx, storeName)).Methods("GET")
-	// r.HandleFunc(fmt.Sprintf("/%s/names", storeName), deleteNameHandler(cliCtx)).Methods("DELETE")
+	r.HandleFunc(fmt.Sprintf("/%s/factlist", storeName), getFactListHandler(cliCtx, storeName)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/{%s}/getFact", storeName, restName), getFactHandler(cliCtx, storeName)).Methods("GET")
+	r.HandleFunc(fmt.Sprintf("/%s/{%s}/getAddressDelegation", storeName, restName), getAddressDelegationHandler(cliCtx, storeName)).Methods("GET")
+
+	r.HandleFunc(fmt.Sprintf("/%s/createfact", storeName), CreateFactHandler(cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/%s/editfact", storeName), EditFactHandler(cliCtx)).Methods("PUT")
+	r.HandleFunc(fmt.Sprintf("/%s/delegatefact", storeName), DelegateFactHandler(cliCtx)).Methods("POST")
+	r.HandleFunc(fmt.Sprintf("/%s/undelegatefact", storeName), DelegateFactHandler(cliCtx)).Methods("POST")
+
 }
