@@ -25,10 +25,12 @@ func NewKeeper(coinKeeper bank.Keeper, storeKey sdk.StoreKey, cdc *codec.Codec) 
 	}
 }
 
-// Gets the entire Fact metadata struct for a name
+// Gets the entire Fact metadata struct
 func (k Keeper) GetFact(ctx sdk.Context, title string) types.Fact {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get([]byte(title))
+
+	key := append(types.FactKey, (title)...)
+	bz := store.Get(key)
 	if bz == nil {
 		//return an empty new fact if fact does not exist
 		return types.NewFact()
@@ -43,7 +45,7 @@ func (k Keeper) HasCreator(ctx sdk.Context, title string) bool {
 	return !k.GetFact(ctx, title).Creator.Empty()
 }
 
-// Sets the entire Whois metadata struct for a name
+// Sets the entire fact metadata struct
 func (k Keeper) SetFact(ctx sdk.Context, fact types.Fact) {
 	if fact.Creator.Empty() {
 		return
@@ -67,4 +69,53 @@ func (k Keeper) GetPrice(ctx sdk.Context, title string) sdk.Coins {
 func (k Keeper) GetFactIterator(ctx sdk.Context) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, types.FactKey)
+}
+
+// function to return delegation
+func (k Keeper) GetFactDelegation(ctx sdk.Context, title string, delegator sdk.AccAddress) types.FactDelegation {
+	store := ctx.KVStore(k.storeKey)
+	key := append(types.FactDelegateKey, (delegator.String() + title)...)
+	bz := store.Get(key)
+	if bz == nil {
+		//return an empty new factdelegation if factdelegation does not exist
+		return types.NewDelegation()
+	}
+	var factDelegation types.FactDelegation
+	k.cdc.MustUnmarshalBinaryBare(bz, &factDelegation)
+	return factDelegation
+}
+
+// function to return if a factdelegation object exist
+func (k Keeper) HasFactDelegation(ctx sdk.Context, title string, delegator sdk.AccAddress) bool {
+	store := ctx.KVStore(k.storeKey)
+	key := append(types.FactDelegateKey, (delegator.String() + title)...)
+	bz := store.Get(key)
+	if bz == nil {
+		return false
+	}
+	return true
+}
+
+// function to set a delegation object
+func (k Keeper) SetFactDelegation(ctx sdk.Context, factdelegation types.FactDelegation) {
+	if factdelegation.Delegator.Empty() {
+		return
+	}
+	store := ctx.KVStore(k.storeKey)
+	key := append(types.FactDelegateKey, (factdelegation.Delegator.String() + factdelegation.Title)...)
+	store.Set(key, k.cdc.MustMarshalBinaryBare(factdelegation))
+}
+
+// Deletes the entire FactDelegation metadata struct
+func (k Keeper) DeleteFactDelegation(ctx sdk.Context, title string, delegator sdk.AccAddress) {
+	store := ctx.KVStore(k.storeKey)
+	key := append(types.FactDelegateKey, (delegator.String() + title)...)
+	store.Delete([]byte(key))
+}
+
+// Get an iterator over all Fact in which the keys are the names and the values are the Fact
+func (k Keeper) GetFactDelegationIterator(ctx sdk.Context, delegator string) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	prefix := append(types.FactDelegateKey, delegator...)
+	return sdk.KVStorePrefixIterator(store, prefix)
 }

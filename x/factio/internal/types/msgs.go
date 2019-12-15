@@ -138,19 +138,17 @@ func (msg MsgEditFact) GetSigners() []sdk.AccAddress {
 
 // MsgEditFact defines a Edit Fact Message
 type MsgDelegateFact struct {
-	Title       string         `json:"title"`
-	Editor      sdk.AccAddress `json:"editor"`
-	Time        int64          `json:"time"`
-	Place       string         `json:"place"`
-	Description string         `json:"description"`
+	Title     string         `json:"title"`
+	Delegator sdk.AccAddress `json:"delegator"`
+	// Amount    sdk.Coins      `json:"json"`
 }
 
 // NewMsgDelegateFact is a constructor function for MsgDelegateFact
-func NewMsgDelegateFact(title string, editor sdk.AccAddress, bid sdk.Coins, time int64, place string, description string) MsgEditFact {
-	return MsgEditFact{
-		Title:  title,
-		Editor: editor,
-		// Amount: amount,
+func NewMsgDelegateFact(title string, Delegator sdk.AccAddress, amount sdk.Coins) MsgDelegateFact {
+	return MsgDelegateFact{
+		Title:     title,
+		Delegator: Delegator,
+		// Amount:    amount,
 	}
 }
 
@@ -162,8 +160,8 @@ func (msg MsgDelegateFact) Type() string { return "delegate_fact" }
 
 // ValidateBasic runs stateless checks on the message
 func (msg MsgDelegateFact) ValidateBasic() sdk.Error {
-	if msg.Editor.Empty() {
-		return sdk.ErrInvalidAddress(msg.Editor.String())
+	if msg.Delegator.Empty() {
+		return sdk.ErrInvalidAddress(msg.Delegator.String())
 	}
 	if len(msg.Title) == 0 {
 		return sdk.ErrUnknownRequest("Title cannot be empty")
@@ -171,18 +169,9 @@ func (msg MsgDelegateFact) ValidateBasic() sdk.Error {
 	if len(msg.Title) >= 60 {
 		return sdk.ErrUnknownRequest("title cannot be more than 60 words")
 	}
-	if len(msg.Description) == 0 {
-		return sdk.ErrUnknownRequest("description cannot be empty")
-	}
-	if len(msg.Description) >= 280 {
-		return sdk.ErrUnknownRequest("description cannot be more than 280 words")
-	}
-	if msg.Time == 0 {
-		return sdk.ErrUnknownRequest("Time cannot be empty")
-	}
-	if len(msg.Place) == 0 {
-		return sdk.ErrUnknownRequest("Place cannot be empty")
-	}
+	// if !msg.Amount.IsAllPositive() {
+	// 	return sdk.ErrInsufficientCoins("Delegation Coins must be positive")
+	// }
 	return nil
 }
 
@@ -193,5 +182,54 @@ func (msg MsgDelegateFact) GetSignBytes() []byte {
 
 // GetSigners defines whose signature is required
 func (msg MsgDelegateFact) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Editor}
+	return []sdk.AccAddress{msg.Delegator}
+}
+
+// MsgEditFact defines a Edit Fact Message
+type MsgUnDelegateFact struct {
+	Title     string         `json:"title"`
+	Delegator sdk.AccAddress `json:"delegator"`
+	// Amount    sdk.Coins      `json:"json"`
+}
+
+// NewMsgDelegateFact is a constructor function for MsgDelegateFact
+func NewMsgUnDelegateFact(title string, Delegator sdk.AccAddress, amount sdk.Coins) MsgDelegateFact {
+	return MsgDelegateFact{
+		Title:     title,
+		Delegator: Delegator,
+		// Amount:    amount,
+	}
+}
+
+// Route should return the name of the module
+func (msg MsgUnDelegateFact) Route() string { return RouterKey }
+
+// Type should return the action
+func (msg MsgUnDelegateFact) Type() string { return "undelegate_fact" }
+
+// ValidateBasic runs stateless checks on the message
+func (msg MsgUnDelegateFact) ValidateBasic() sdk.Error {
+	if msg.Delegator.Empty() {
+		return sdk.ErrInvalidAddress(msg.Delegator.String())
+	}
+	if len(msg.Title) == 0 {
+		return sdk.ErrUnknownRequest("Title cannot be empty")
+	}
+	if len(msg.Title) >= 60 {
+		return sdk.ErrUnknownRequest("title cannot be more than 60 words")
+	}
+	// if !msg.Amount.IsAllPositive() {
+	// 	return sdk.ErrInsufficientCoins("Delegation Coins must be positive")
+	// }
+	return nil
+}
+
+// GetSignBytes encodes the message for signing
+func (msg MsgUnDelegateFact) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+// GetSigners defines whose signature is required
+func (msg MsgUnDelegateFact) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Delegator}
 }

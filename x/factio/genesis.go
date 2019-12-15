@@ -10,7 +10,7 @@ import (
 )
 
 type GenesisState struct {
-	FactRecords []Fact `json:"whois_records"`
+	FactRecords []Fact `json:"facts_records"`
 }
 
 func NewGenesisState(whoIsRecords []Fact) GenesisState {
@@ -20,10 +20,10 @@ func NewGenesisState(whoIsRecords []Fact) GenesisState {
 func ValidateGenesis(data GenesisState) error {
 	for _, record := range data.FactRecords {
 		if record.Creator == nil {
-			return fmt.Errorf("invalid WhoisRecord: Value: . Error: Missing Owner")
+			return fmt.Errorf("invalid factsRecord: Value: . Error: Missing Owner")
 		}
 		if record.Description == "" {
-			return fmt.Errorf("invalid WhoisRecord: Owner: . Error: Missing Value")
+			return fmt.Errorf("invalid factsRecord: Owner: . Error: Missing Value")
 		}
 		if record.Price == nil {
 			return fmt.Errorf("invalid WhoisRecord: Value: . Error: Missing Price")

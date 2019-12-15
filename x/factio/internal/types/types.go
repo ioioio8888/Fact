@@ -1,7 +1,9 @@
 package types
 
 import (
+	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"strings"
 )
 
 // MinPrice is 1 facttoken
@@ -15,7 +17,19 @@ type Fact struct {
 	Description string           `json:"description"`
 	Creator     sdk.AccAddress   `json:"creator"`
 	Price       sdk.Coins        `json:"price"`
-	Stakers     []sdk.AccAddress `json:"stakers"`
+	Delegators  []sdk.AccAddress `json:"delegators"`
+}
+
+// implement fmt.Stringer
+func (w Fact) String() string {
+	return strings.TrimSpace(fmt.Sprintf(`Title: %s
+Time: %d
+Place: %s
+Description: %s
+Creator: %s
+Price: %s
+Delegators: %s
+`, w.Title, w.Time, w.Place, w.Description, w.Creator, w.Price, w.Delegators))
 }
 
 // NewFact returns a new Fact
@@ -25,18 +39,14 @@ func NewFact() Fact {
 	}
 }
 
-//Fact Check Delegation struct
-type FactCheckDelegation struct {
-	DelegatorAddress sdk.AccAddress `json:"delegator_address"`
-	Title            string         `json:"title"`
-	Shares           sdk.Dec        `json:"shares"`
+//Fact Delegation struct
+type FactDelegation struct {
+	Delegator sdk.AccAddress `json:"delegator_address"`
+	Title     string         `json:"title"`
+	Shares    sdk.Coins      `json:"shares"`
 }
 
 // NewDelegation creates a new delegation object
-func NewDelegation(delegatorAddr sdk.AccAddress, title string, shares sdk.Dec) FactCheckDelegation {
-	return FactCheckDelegation{
-		DelegatorAddress: delegatorAddr,
-		Title:            title,
-		Shares:           shares,
-	}
+func NewDelegation() FactDelegation {
+	return FactDelegation{}
 }
