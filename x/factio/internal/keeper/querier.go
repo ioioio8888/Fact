@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"bytes"
-	"encoding/json"
+
 	"github.com/ioioio8888/factio/x/factio/internal/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -54,14 +54,12 @@ func queryFact(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Kee
 func queryAddressDelegation(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 
 	var factDelegationList types.QueryResFactDelegationList
-	var factDelegation types.FactDelegation
 	iterator := keeper.GetFactDelegationIterator(ctx, path[0])
 
 	for ; iterator.Valid(); iterator.Next() {
-		if err := json.Unmarshal(iterator.Value(), &factDelegation); err != nil {
-			panic(err)
-		}
-		factDelegationList = append(factDelegationList, factDelegation.Title)
+		var out types.FactDelegation
+		keeper.cdc.UnmarshalBinaryBare(iterator.Value(), &out)
+		factDelegationList = append(factDelegationList, out.Title)
 	}
 	res, err := codec.MarshalJSONIndent(keeper.cdc, factDelegationList)
 	if err != nil {
