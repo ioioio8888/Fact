@@ -70,7 +70,9 @@ func handleMsgEditFact(ctx sdk.Context, keeper Keeper, msg types.MsgEditFact) sd
 
 // Handle a message to delegate Fact
 func handleMsgDelegateFact(ctx sdk.Context, keeper Keeper, msg types.MsgDelegateFact) sdk.Result {
-
+	if keeper.GetFact(ctx, msg.Title).Creator.Empty() {
+		return types.ErrFactDoesNotExist("Fact does not exist").Result()
+	}
 	if keeper.HasFactDelegation(ctx, msg.Title, msg.Delegator) {
 		return sdk.ErrInvalidAddress("This address has already delegated on this fact").Result()
 	}
@@ -117,7 +119,9 @@ func RemoveIndex(s []sdk.AccAddress, staker sdk.AccAddress) []sdk.AccAddress {
 
 // Handle a message to delegate Fact
 func handleMsgUnDelegateFact(ctx sdk.Context, keeper Keeper, msg types.MsgUnDelegateFact) sdk.Result {
-
+	if keeper.GetFact(ctx, msg.Title).Creator.Empty() {
+		return types.ErrFactDoesNotExist("Fact does not exist").Result()
+	}
 	if !keeper.HasFactDelegation(ctx, msg.Title, msg.Delegator) {
 		return sdk.ErrInvalidAddress("This address hasn't delegated on this fact").Result()
 	}

@@ -8,10 +8,10 @@ import (
 const (
 	DefaultCodespace sdk.CodespaceType = ModuleName
 
-	CodeNameDoesNotExist sdk.CodeType = 101
+	CodeFactDoesNotExist sdk.CodeType = 101
 )
 
-// ErrNameDoesNotExist is the error for name not existing
-func ErrNameDoesNotExist(codespace sdk.CodespaceType) sdk.Error {
-	return sdk.NewError(codespace, CodeNameDoesNotExist, "Name does not exist")
+// ErrFactDoesNotExist is the error for fact not existing
+func ErrFactDoesNotExist(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeFactDoesNotExist, "Fact does not exist")
 }
