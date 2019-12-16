@@ -81,7 +81,7 @@ func handleMsgDelegateFact(ctx sdk.Context, keeper Keeper, msg types.MsgDelegate
 	if err != nil {
 		return sdk.ErrInsufficientCoins("Buyer does not have enough coins").Result()
 	}
-	dfcoin, _ := sdk.ParseCoins("1delegatedfactcoin")
+	dfcoin, _ := sdk.ParseCoins("1dfactcoin")
 	_, err = keeper.CoinKeeper.AddCoins(ctx, msg.Delegator, dfcoin) // If so, deduct the Bid amount from the sender
 	if err != nil {
 		return sdk.ErrInvalidCoins("Error adding coins").Result()
@@ -125,7 +125,7 @@ func handleMsgUnDelegateFact(ctx sdk.Context, keeper Keeper, msg types.MsgUnDele
 	if !keeper.HasFactDelegation(ctx, msg.Title, msg.Delegator) {
 		return sdk.ErrInvalidAddress("This address hasn't delegated on this fact").Result()
 	}
-	dfcoin, _ := sdk.ParseCoins("1delegatedfactcoin")
+	dfcoin, _ := sdk.ParseCoins("1dfactcoin")
 	_, err := keeper.CoinKeeper.SubtractCoins(ctx, msg.Delegator, dfcoin) // If so, deduct the Bid amount from the sender
 	if err != nil {
 		return sdk.ErrInvalidCoins("Error adding coins").Result()
