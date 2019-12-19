@@ -85,7 +85,7 @@ type factioApp struct {
 	distrKeeper    distr.Keeper
 	supplyKeeper   supply.Keeper
 	paramsKeeper   params.Keeper
-	nsKeeper       factio.Keeper
+	factkeeper     factio.Keeper
 
 	// Module Manager
 	mm *module.Manager
@@ -190,7 +190,7 @@ func NewfactioApp(
 
 	// The factioKeeper is the Keeper from the module for this tutorial
 	// It handles interactions with the namestore
-	app.nsKeeper = factio.NewKeeper(
+	app.factkeeper = factio.NewKeeper(
 		app.bankKeeper,
 		keys[factio.StoreKey],
 		app.cdc,
@@ -201,14 +201,14 @@ func NewfactioApp(
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
 		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
-		factio.NewAppModule(app.nsKeeper, app.bankKeeper),
+		factio.NewAppModule(app.factkeeper, app.bankKeeper),
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
 		distr.NewAppModule(app.distrKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.distrKeeper, app.accountKeeper, app.supplyKeeper),
 	)
 
-	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName)
+	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName, factio.ModuleName)
 	app.mm.SetOrderEndBlockers(staking.ModuleName)
 
 	// Sets the order of Genesis - Order matters, genutil is to always come last
@@ -274,9 +274,11 @@ func (app *factioApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) ab
 }
 
 func (app *factioApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+
 	return app.mm.BeginBlock(ctx, req)
 }
 func (app *factioApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+	factio.BeginBlocker(ctx, app.factkeeper)
 	return app.mm.EndBlock(ctx, req)
 }
 func (app *factioApp) LoadHeight(height int64) error {

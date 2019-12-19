@@ -18,6 +18,7 @@ type Fact struct {
 	Creator     sdk.AccAddress   `json:"creator"`
 	Price       sdk.Coins        `json:"price"`
 	Delegators  []sdk.AccAddress `json:"delegators"`
+	Tags        []string         `json:"tags"`
 }
 
 // implement fmt.Stringer
@@ -49,4 +50,14 @@ type FactDelegation struct {
 // NewDelegation creates a new delegation object
 func NewDelegation() FactDelegation {
 	return FactDelegation{}
+}
+
+//Fact Delegation struct
+type FactDelegationList struct {
+	Delegations []FactDelegation `json:"delegations"`
+}
+
+// NewDelegation creates a new delegation object
+func NewDelegationList() FactDelegationList {
+	return FactDelegationList{}
 }

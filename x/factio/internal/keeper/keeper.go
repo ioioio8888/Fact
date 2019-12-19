@@ -119,3 +119,24 @@ func (k Keeper) GetFactDelegationIterator(ctx sdk.Context, delegator string) sdk
 	prefix := append(types.FactDelegateKey, delegator...)
 	return sdk.KVStorePrefixIterator(store, prefix)
 }
+
+// Get an iterator over all Fact in which the keys are the names and the values are the Fact
+func (k Keeper) GetAllFactDelegationIterator(ctx sdk.Context) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, types.FactDelegateKey)
+}
+
+//return all fact delegations
+func (k Keeper) GetAllFactDelegation(ctx sdk.Context) types.FactDelegationList {
+
+	factDelegationList := types.NewDelegationList()
+	iterator := k.GetAllFactDelegationIterator(ctx)
+
+	for ; iterator.Valid(); iterator.Next() {
+		var out types.FactDelegation
+		k.cdc.UnmarshalBinaryBare(iterator.Value(), &out)
+		factDelegationList.Delegations = append(factDelegationList.Delegations, out)
+	}
+
+	return factDelegationList
+}

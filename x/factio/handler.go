@@ -3,9 +3,8 @@ package factio
 import (
 	"fmt"
 
-	"github.com/ioioio8888/factio/x/factio/internal/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ioioio8888/factio/x/factio/internal/types"
 )
 
 // NewHandler returns a handler for "factio" type messages.
