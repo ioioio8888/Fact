@@ -7,12 +7,12 @@ import (
 
 func BeginBlocker(ctx sdk.Context, keeper keeper.Keeper) {
 
-	factDelegationList := keeper.GetAllFactDelegation(ctx)
-	fcoin, _ := sdk.ParseCoins("1factcoin")
-	if ctx.BlockHeight() > 1 {
-		for _, delegation := range factDelegationList.Delegations {
-			// delegation is the element from all delegations for where we are
-			keeper.CoinKeeper.AddCoins(ctx, delegation.Delegator, fcoin)
-		}
-	}
+	// factDelegationList := keeper.GetAllFactDelegation(ctx)
+	// fcoin, _ := sdk.ParseCoins("1factcoin")
+	// if ctx.BlockHeight() > 1 {
+	// 	for _, delegation := range factDelegationList.Delegations {
+	// 		// delegation is the element from all delegations for where we are
+	// 		keeper.CoinKeeper.AddCoins(ctx, delegation.Delegator, fcoin)
+	// 	}
+	// }
 }

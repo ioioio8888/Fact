@@ -1,6 +1,8 @@
 package types
 
-import "strings"
+import (
+	"strings"
+)
 
 // QueryResFactDelegationList is a list of title that address that has been delegated to it
 type QueryResFactDelegationList []string

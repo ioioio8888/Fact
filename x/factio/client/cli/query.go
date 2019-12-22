@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ioioio8888/factio/x/factio/internal/types"
 	"github.com/spf13/cobra"
 )
@@ -22,6 +23,7 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		GetCmdGetFact(storeKey, cdc),
 		GetCmdGetAddressDelegation(storeKey, cdc),
 		GetCmdGetFactList(storeKey, cdc),
+		GetCmdGetAccountCoins(storeKey, cdc),
 	)...)
 	return factioQueryCmd
 }
@@ -87,6 +89,27 @@ func GetCmdGetFactList(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return nil
 			}
 			var out types.QueryResFactList
+			cdc.MustUnmarshalJSON(res, &out)
+			return cliCtx.PrintOutput(out)
+		},
+	}
+}
+
+// GetCmdGetFactList queries a list of fact
+func GetCmdGetAccountCoins(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "get-acc-coins [address]",
+		Short: "get-acc-coins [address]",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			address := args[0]
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/getAccCoins/%s", queryRoute, address), nil)
+			if err != nil {
+				fmt.Printf("Error: %s", err)
+				return nil
+			}
+			var out sdk.Coins
 			cdc.MustUnmarshalJSON(res, &out)
 			return cliCtx.PrintOutput(out)
 		},
