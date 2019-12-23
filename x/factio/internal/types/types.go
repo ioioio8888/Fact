@@ -18,6 +18,8 @@ type Fact struct {
 	Creator     sdk.AccAddress   `json:"creator"`
 	Price       sdk.Coins        `json:"price"`
 	Delegators  []sdk.AccAddress `json:"delegators"`
+	Upvoters    []sdk.AccAddress `json:"upvoters"`
+	Downvoters  []sdk.AccAddress `json:"downvoters"`
 	Tags        []string         `json:"tags"`
 }
 
@@ -42,7 +44,7 @@ func NewFact() Fact {
 
 //Fact Delegation struct
 type FactDelegation struct {
-	Delegator sdk.AccAddress `json:"delegator_address"`
+	Delegator sdk.AccAddress `json:"delegator"`
 	Title     string         `json:"title"`
 	Shares    sdk.Coins      `json:"shares"`
 }
@@ -60,4 +62,42 @@ type FactDelegationList struct {
 // NewDelegation creates a new delegation object
 func NewDelegationList() FactDelegationList {
 	return FactDelegationList{}
+}
+
+type VotePower struct {
+	Voter sdk.AccAddress `json:"voter"`
+	Power sdk.Dec        `json:"power"`
+}
+
+// implement fmt.Stringer
+func (r VotePower) String() string {
+	return r.Power.String()
+}
+
+// NewDelegation creates a new delegation object
+func NewVotePower() VotePower {
+	return VotePower{}
+}
+
+//Votepower list struct
+type VotePowerList struct {
+	VotePowers []VotePower `json:"votePower"`
+}
+
+// NewVotePowerList creates a new votePowerList object
+func NewVotePowerList() VotePowerList {
+	return VotePowerList{}
+}
+
+//VoteOnFact struct
+type VoteOnFact struct {
+	Voter sdk.AccAddress `json:"voter"`
+	Title string         `json:"title"`
+	//it is true when it is a upvote, false when it is a downvote
+	Upvote bool `json:"upvote"`
+}
+
+// NewVoteOnFact creates a new VoteOnFact object
+func NewVoteOnFact() VoteOnFact {
+	return VoteOnFact{}
 }

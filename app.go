@@ -274,11 +274,10 @@ func (app *factioApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) ab
 }
 
 func (app *factioApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
-
+	factio.BeginBlocker(ctx, app.factkeeper)
 	return app.mm.BeginBlock(ctx, req)
 }
 func (app *factioApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
-	factio.BeginBlocker(ctx, app.factkeeper)
 	return app.mm.EndBlock(ctx, req)
 }
 func (app *factioApp) LoadHeight(height int64) error {

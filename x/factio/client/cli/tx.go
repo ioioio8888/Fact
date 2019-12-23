@@ -28,6 +28,7 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		GetCmdEditFact(cdc),
 		GetCmdDelegateFact(cdc),
 		GetCmdUnDelegateFact(cdc),
+		GetCmdVoteFact(cdc),
 	)...)
 
 	return factioTxCmd
@@ -123,6 +124,35 @@ func GetCmdUnDelegateFact(cdc *codec.Codec) *cobra.Command {
 
 			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
 			msg := types.NewMsgUnDelegateFact(args[0], cliCtx.GetFromAddress())
+			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
+
+// GetCmdvoteFact is the CLI command for sending a UnVoteFact transaction
+func GetCmdVoteFact(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "vote-fact [title] [stance]",
+		Short: "vote on a fact, stance: upvote/downvote ",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			var stance bool
+			if args[1] == "upvote" {
+				stance = true
+			} else if args[1] == "downvote" {
+				stance = false
+			} else {
+				return types.ErrFactDoesNotExist("Invalid stance")
+			}
+			msg := types.NewMsgVoteFact(args[0], cliCtx.GetFromAddress(), stance)
 			err := msg.ValidateBasic()
 			if err != nil {
 				return err

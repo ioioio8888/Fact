@@ -19,6 +19,8 @@ func NewHandler(keeper Keeper) sdk.Handler {
 			return handleMsgDelegateFact(ctx, keeper, msg)
 		case types.MsgUnDelegateFact:
 			return handleMsgUnDelegateFact(ctx, keeper, msg)
+		case types.MsgVoteFact:
+			return handleMsgVoteFact(ctx, keeper, msg)
 		default:
 			errMsg := fmt.Sprintf("Unrecognized factio Msg type: %v", msg.Type())
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -143,4 +145,67 @@ func handleMsgUnDelegateFact(ctx sdk.Context, keeper Keeper, msg types.MsgUnDele
 	keeper.SetFact(ctx, fact)
 
 	return sdk.Result{}
+}
+
+//handlge a msg to vote on fact
+func handleMsgVoteFact(ctx sdk.Context, keeper Keeper, msg types.MsgVoteFact) sdk.Result {
+	fact := keeper.GetFact(ctx, msg.Title)
+	if fact.Creator.Empty() {
+		return types.ErrFactDoesNotExist("Fact does not exist").Result()
+	}
+	//check if it is voted on same side before
+	if keeper.HasVoteOnFact(ctx, msg.Title, msg.Voter) {
+		if keeper.GetVoteOnFact(ctx, msg.Title, msg.Voter).Upvote == msg.UpVote {
+			return types.ErrRepeatedVote("Repeated Vote").Result()
+		}
+	}
+	if !keeper.HasVotePower(ctx, msg.Voter) {
+		keeper.CreateVotePower(ctx, msg.Voter)
+	}
+	votepower := keeper.GetVotePower(ctx, msg.Voter)
+	//check if it has enough vote power
+	if sdk.NewDec(1).GT(votepower.Power) {
+		return types.ErrVotePower("Not enough vote power").Result()
+	}
+	//deduct 1 power from the address's votepower
+	votepower.Power = votepower.Power.Sub(sdk.NewDec(1))
+	keeper.SetVotePower(ctx, votepower)
+
+	//set vote on fact
+	voteOnFact := keeper.GetVoteOnFact(ctx, msg.Title, msg.Voter)
+	voteOnFact.Voter = msg.Voter
+	voteOnFact.Title = msg.Title
+	voteOnFact.Upvote = msg.UpVote
+	keeper.SetVoteOnFact(ctx, voteOnFact)
+
+	//set the fact
+	if msg.UpVote {
+		//get the fact and remove the downvoter before to the list in fact
+		fact := keeper.GetFact(ctx, msg.Title)
+		if contains(fact.Downvoters, msg.Voter) {
+			fact.Downvoters = RemoveIndex(fact.Downvoters, msg.Voter)
+		}
+		//set the upvoters in the list
+		fact.Upvoters = append(fact.Upvoters, msg.Voter)
+		keeper.SetFact(ctx, fact)
+	} else {
+		//get the fact and remove the upvoter before to the list in fact
+		fact := keeper.GetFact(ctx, msg.Title)
+		if contains(fact.Upvoters, msg.Voter) {
+			fact.Upvoters = RemoveIndex(fact.Upvoters, msg.Voter)
+		}
+		//set the downvoters in the list
+		fact.Downvoters = append(fact.Downvoters, msg.Voter)
+		keeper.SetFact(ctx, fact)
+	}
+	return sdk.Result{}
+}
+
+func contains(s []sdk.AccAddress, e sdk.AccAddress) bool {
+	for _, a := range s {
+		if a.Equals(e) {
+			return true
+		}
+	}
+	return false
 }

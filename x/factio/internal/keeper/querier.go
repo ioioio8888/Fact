@@ -16,6 +16,7 @@ const (
 	QueryAddressDelegation = "getAddressDelegation"
 	QueryFactList          = "getFactList"
 	QueryAccountCoins      = "getAccCoins"
+	QueryVotePower         = "getVotePower"
 )
 
 // NewQuerier is the module level router for state queries
@@ -30,6 +31,8 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 			return queryFactList(ctx, req, keeper)
 		case QueryAccountCoins:
 			return queryAccountCoins(ctx, path[1:], req, keeper)
+		case QueryVotePower:
+			return queryVotePower(ctx, path[1:], req, keeper)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown factio query endpoint")
 		}
@@ -99,6 +102,22 @@ func queryAccountCoins(ctx sdk.Context, path []string, req abci.RequestQuery, ke
 	}
 	coins = keeper.CoinKeeper.GetCoins(ctx, address)
 	res, err := codec.MarshalJSONIndent(keeper.cdc, coins)
+	if err != nil {
+		panic("could not marshal result to JSON")
+	}
+
+	return res, nil
+}
+
+// return an account's coins
+func queryVotePower(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	var votePower types.VotePower
+	address, aerr := sdk.AccAddressFromBech32(path[0])
+	if aerr != nil {
+		panic("address format is not correct")
+	}
+	votePower = keeper.GetVotePower(ctx, address)
+	res, err := codec.MarshalJSONIndent(keeper.cdc, votePower)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}

@@ -24,6 +24,7 @@ func GetQueryCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		GetCmdGetAddressDelegation(storeKey, cdc),
 		GetCmdGetFactList(storeKey, cdc),
 		GetCmdGetAccountCoins(storeKey, cdc),
+		GetCmdGetVotePower(storeKey, cdc),
 	)...)
 	return factioQueryCmd
 }
@@ -95,7 +96,7 @@ func GetCmdGetFactList(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 }
 
-// GetCmdGetFactList queries a list of fact
+// GetCmdGetAccountCoins queries a list of coins that address has
 func GetCmdGetAccountCoins(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "get-acc-coins [address]",
@@ -110,6 +111,27 @@ func GetCmdGetAccountCoins(queryRoute string, cdc *codec.Codec) *cobra.Command {
 				return nil
 			}
 			var out sdk.Coins
+			cdc.MustUnmarshalJSON(res, &out)
+			return cliCtx.PrintOutput(out)
+		},
+	}
+}
+
+// GetCmdGetVotePower queries a votepower
+func GetCmdGetVotePower(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "get-vote-power [address]",
+		Short: "get-vote-power [address]",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			address := args[0]
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/getVotePower/%s", queryRoute, address), nil)
+			if err != nil {
+				fmt.Printf("Error: %s", err)
+				return nil
+			}
+			var out types.VotePower
 			cdc.MustUnmarshalJSON(res, &out)
 			return cliCtx.PrintOutput(out)
 		},

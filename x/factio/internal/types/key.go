@@ -13,4 +13,6 @@ var (
 	// Keys for store prefixes
 	FactKey         = []byte{0x11} // prefix for Facts
 	FactDelegateKey = []byte{0x12} // prefix for the FactCheck
+	VotePowerKey    = []byte{0x13} // prefix for the VotePower
+	VoteOnFactKey   = []byte{0x14} // prefix for the VoteOnFact
 )

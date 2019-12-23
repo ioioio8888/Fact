@@ -185,7 +185,7 @@ func (msg MsgDelegateFact) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Delegator}
 }
 
-// MsgEditFact defines a Edit Fact Message
+// MsgEditFact defines a UnDelegate Fact Message
 type MsgUnDelegateFact struct {
 	Title     string         `json:"title"`
 	Delegator sdk.AccAddress `json:"delegator"`
@@ -232,4 +232,95 @@ func (msg MsgUnDelegateFact) GetSignBytes() []byte {
 // GetSigners defines whose signature is required
 func (msg MsgUnDelegateFact) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Delegator}
+}
+
+// MsgVoteFact defines a Vote Fact Message
+type MsgVoteFact struct {
+	Title  string         `json:"title"`
+	Voter  sdk.AccAddress `json:"voter"`
+	UpVote bool           `json:"upvote"`
+}
+
+// NewMsgVoteFact is a constructor function for MsgVoteFact
+func NewMsgVoteFact(title string, voter sdk.AccAddress, upvote bool) MsgVoteFact {
+	return MsgVoteFact{
+		Title:  title,
+		Voter:  voter,
+		UpVote: upvote,
+	}
+}
+
+// Route should return the name of the module
+func (msg MsgVoteFact) Route() string { return RouterKey }
+
+// Type should return the action
+func (msg MsgVoteFact) Type() string { return "Vote_fact" }
+
+// ValidateBasic runs stateless checks on the message
+func (msg MsgVoteFact) ValidateBasic() sdk.Error {
+	if msg.Voter.Empty() {
+		return sdk.ErrInvalidAddress(msg.Voter.String())
+	}
+	if len(msg.Title) == 0 {
+		return sdk.ErrUnknownRequest("Title cannot be empty")
+	}
+	if len(msg.Title) >= 60 {
+		return sdk.ErrUnknownRequest("title cannot be more than 60 words")
+	}
+	return nil
+}
+
+// GetSignBytes encodes the message for signing
+func (msg MsgVoteFact) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+// GetSigners defines whose signature is required
+func (msg MsgVoteFact) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Voter}
+}
+
+// MsgUnVoteFact defines a Vote Fact Message
+type MsgUnVoteFact struct {
+	Title  string         `json:"title"`
+	Voter  sdk.AccAddress `json:"voter"`
+	UpVote bool           `json:"upvote"`
+}
+
+// NewMsgUnVoteFact is a constructor function for MsgUnVoteFact
+func NewMsgUnVoteFact(title string, Voter sdk.AccAddress) MsgVoteFact {
+	return MsgVoteFact{
+		Title: title,
+		Voter: Voter,
+	}
+}
+
+// Route should return the name of the module
+func (msg MsgUnVoteFact) Route() string { return RouterKey }
+
+// Type should return the action
+func (msg MsgUnVoteFact) Type() string { return "Vote_fact" }
+
+// ValidateBasic runs stateless checks on the message
+func (msg MsgUnVoteFact) ValidateBasic() sdk.Error {
+	if msg.Voter.Empty() {
+		return sdk.ErrInvalidAddress(msg.Voter.String())
+	}
+	if len(msg.Title) == 0 {
+		return sdk.ErrUnknownRequest("Title cannot be empty")
+	}
+	if len(msg.Title) >= 60 {
+		return sdk.ErrUnknownRequest("title cannot be more than 60 words")
+	}
+	return nil
+}
+
+// GetSignBytes encodes the message for signing
+func (msg MsgUnVoteFact) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
+
+// GetSigners defines whose signature is required
+func (msg MsgUnVoteFact) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Voter}
 }
