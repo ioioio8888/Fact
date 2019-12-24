@@ -287,8 +287,8 @@ type MsgUnVoteFact struct {
 }
 
 // NewMsgUnVoteFact is a constructor function for MsgUnVoteFact
-func NewMsgUnVoteFact(title string, Voter sdk.AccAddress) MsgVoteFact {
-	return MsgVoteFact{
+func NewMsgUnVoteFact(title string, Voter sdk.AccAddress) MsgUnVoteFact {
+	return MsgUnVoteFact{
 		Title: title,
 		Voter: Voter,
 	}

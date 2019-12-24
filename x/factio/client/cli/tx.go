@@ -29,6 +29,7 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 		GetCmdDelegateFact(cdc),
 		GetCmdUnDelegateFact(cdc),
 		GetCmdVoteFact(cdc),
+		GetCmdUnVoteFact(cdc),
 	)...)
 
 	return factioTxCmd
@@ -153,6 +154,27 @@ func GetCmdVoteFact(cdc *codec.Codec) *cobra.Command {
 				return types.ErrFactDoesNotExist("Invalid stance")
 			}
 			msg := types.NewMsgVoteFact(args[0], cliCtx.GetFromAddress(), stance)
+			err := msg.ValidateBasic()
+			if err != nil {
+				return err
+			}
+			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
+			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+		},
+	}
+}
+
+// GetCmdunvoteFact is the CLI command for sending a UnVoteFact transaction
+func GetCmdUnVoteFact(cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "unvote-fact [title]",
+		Short: "unvote a fact ",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
+			msg := types.NewMsgUnVoteFact(args[0], cliCtx.GetFromAddress())
 			err := msg.ValidateBasic()
 			if err != nil {
 				return err
