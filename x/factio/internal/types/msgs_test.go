@@ -1,52 +1,61 @@
 package types
 
-// import (
-// 	"testing"
+import (
+	"testing"
+	"time"
 
-// 	sdk "github.com/cosmos/cosmos-sdk/types"
-// 	"github.com/stretchr/testify/require"
-// )
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/require"
+)
 
-// var name = "maTurtle"
+func TestMsgSetFact(t *testing.T) {
+	factname := "testfact"
+	coins := sdk.NewCoins(sdk.NewInt64Coin("factcoin", 1))
+	acc := sdk.AccAddress([]byte("me"))
+	now := int64(time.Now().Unix())
+	place := "here"
+	description := "something"
+	var msg = NewMsgCreateFact(factname, acc, coins, now, place, description)
 
-// func TestMsgSetName(t *testing.T) {
-// 	value := "1"
-// 	acc := sdk.AccAddress([]byte("me"))
-// 	var msg = NewMsgSetName(name, value, acc)
+	require.Equal(t, msg.Route(), RouterKey)
+	require.Equal(t, msg.Type(), "create_fact")
+}
 
-// 	require.Equal(t, msg.Route(), RouterKey)
-// 	require.Equal(t, msg.Type(), "set_name")
-// }
+func TestMsgCreateFactValidation(t *testing.T) {
+	factname := "testfact"
+	coins := sdk.NewCoins(sdk.NewInt64Coin("factcoin", 1))
+	acc := sdk.AccAddress([]byte("me"))
+	now := int64(time.Now().Unix())
+	place := "here"
+	description := "something"
+	factname2 := "a"
+	acc2 := sdk.AccAddress([]byte("you"))
 
-// func TestMsgSetNameValidation(t *testing.T) {
-// 	value := "1"
-// 	acc := sdk.AccAddress([]byte("me"))
-// 	name2 := "a"
-// 	value2 := "2"
-// 	acc2 := sdk.AccAddress([]byte("you"))
+	cases := []struct {
+		valid bool
+		tx    MsgCreateFact
+	}{
+		{true, NewMsgCreateFact(factname, acc, coins, now, place, description)},
+		{true, NewMsgCreateFact(factname2, acc, coins, now, place, description)},
+		{true, NewMsgCreateFact(factname, acc2, coins, now, place, description)},
+		{true, NewMsgCreateFact(factname2, acc2, coins, now, place, description)},
+		{false, NewMsgCreateFact("", acc, coins, now, place, description)},
+		{false, NewMsgCreateFact(factname, nil, coins, now, place, description)},
+		{false, NewMsgCreateFact(factname, acc, nil, now, place, description)},
+		{false, NewMsgCreateFact(factname, acc, coins, 0, place, description)},
+		{false, NewMsgCreateFact(factname, acc, coins, now, "", description)},
+		{false, NewMsgCreateFact(factname, acc, coins, now, place, "")},
+	}
 
-// 	cases := []struct {
-// 		valid bool
-// 		tx    MsgSetName
-// 	}{
-// 		{true, NewMsgSetName(name, value, acc)},
-// 		{true, NewMsgSetName(name2, value2, acc2)},
-// 		{true, NewMsgSetName(name2, value, acc2)},
-// 		{true, NewMsgSetName(name2, value2, acc)},
-// 		{false, NewMsgSetName(name, value2, nil)},
-// 		{false, NewMsgSetName("", value2, acc2)},
-// 		{false, NewMsgSetName(name, "", acc2)},
-// 	}
-
-// 	for _, tc := range cases {
-// 		err := tc.tx.ValidateBasic()
-// 		if tc.valid {
-// 			require.Nil(t, err)
-// 		} else {
-// 			require.NotNil(t, err)
-// 		}
-// 	}
-// }
+	for _, tc := range cases {
+		err := tc.tx.ValidateBasic()
+		if tc.valid {
+			require.Nil(t, err)
+		} else {
+			require.NotNil(t, err)
+		}
+	}
+}
 
 // func TestMsgSetNameGetSignBytes(t *testing.T) {
 // 	value := "1"
