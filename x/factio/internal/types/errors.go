@@ -11,6 +11,7 @@ const (
 	CodeFactDoesNotExist sdk.CodeType = 101
 	CodeRepeatedVote     sdk.CodeType = 102
 	CodeVotePower        sdk.CodeType = 103
+	CodeVoteDoesNotExist sdk.CodeType = 104
 )
 
 // ErrFactDoesNotExist is the error for fact not existing
@@ -26,4 +27,9 @@ func ErrRepeatedVote(codespace sdk.CodespaceType) sdk.Error {
 // ErrVotePower is the error for not enough vote power
 func ErrVotePower(codespace sdk.CodespaceType) sdk.Error {
 	return sdk.NewError(codespace, CodeVotePower, "Not Enough vote power")
+}
+
+// ErrVoteDoesNotExist is the error for vote not existing
+func ErrVoteDoesNotExist(codespace sdk.CodespaceType) sdk.Error {
+	return sdk.NewError(codespace, CodeVoteDoesNotExist, "Vote does not exist")
 }

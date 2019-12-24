@@ -21,6 +21,8 @@ func NewHandler(keeper Keeper) sdk.Handler {
 			return handleMsgUnDelegateFact(ctx, keeper, msg)
 		case types.MsgVoteFact:
 			return handleMsgVoteFact(ctx, keeper, msg)
+		case types.MsgUnVoteFact:
+			return handleMsgUnVoteFact(ctx, keeper, msg)
 		default:
 			errMsg := fmt.Sprintf("Unrecognized factio Msg type: %v", msg.Type())
 			return sdk.ErrUnknownRequest(errMsg).Result()
@@ -153,7 +155,7 @@ func handleMsgVoteFact(ctx sdk.Context, keeper Keeper, msg types.MsgVoteFact) sd
 	if fact.Creator.Empty() {
 		return types.ErrFactDoesNotExist("Fact does not exist").Result()
 	}
-	//check if it is voted on same side before
+	//check if the address is voted on same side before
 	if keeper.HasVoteOnFact(ctx, msg.Title, msg.Voter) {
 		if keeper.GetVoteOnFact(ctx, msg.Title, msg.Voter).Upvote == msg.UpVote {
 			return types.ErrRepeatedVote("Repeated Vote").Result()
@@ -163,7 +165,7 @@ func handleMsgVoteFact(ctx sdk.Context, keeper Keeper, msg types.MsgVoteFact) sd
 		keeper.CreateVotePower(ctx, msg.Voter)
 	}
 	votepower := keeper.GetVotePower(ctx, msg.Voter)
-	//check if it has enough vote power
+	//check if the address has enough vote power
 	if sdk.NewDec(1).GT(votepower.Power) {
 		return types.ErrVotePower("Not enough vote power").Result()
 	}
@@ -180,7 +182,7 @@ func handleMsgVoteFact(ctx sdk.Context, keeper Keeper, msg types.MsgVoteFact) sd
 
 	//set the fact
 	if msg.UpVote {
-		//get the fact and remove the downvoter before to the list in fact
+		//get the fact and remove the vote that if the address has voted on different stance
 		fact := keeper.GetFact(ctx, msg.Title)
 		if contains(fact.Downvoters, msg.Voter) {
 			fact.Downvoters = RemoveIndex(fact.Downvoters, msg.Voter)
@@ -189,7 +191,7 @@ func handleMsgVoteFact(ctx sdk.Context, keeper Keeper, msg types.MsgVoteFact) sd
 		fact.Upvoters = append(fact.Upvoters, msg.Voter)
 		keeper.SetFact(ctx, fact)
 	} else {
-		//get the fact and remove the upvoter before to the list in fact
+		//get the fact and remove the vote that if the address hason voted on different stance
 		fact := keeper.GetFact(ctx, msg.Title)
 		if contains(fact.Upvoters, msg.Voter) {
 			fact.Upvoters = RemoveIndex(fact.Upvoters, msg.Voter)
@@ -208,4 +210,28 @@ func contains(s []sdk.AccAddress, e sdk.AccAddress) bool {
 		}
 	}
 	return false
+}
+
+//handlge a msg to unvote fact
+func handleMsgUnVoteFact(ctx sdk.Context, keeper Keeper, msg types.MsgUnVoteFact) sdk.Result {
+	fact := keeper.GetFact(ctx, msg.Title)
+	if fact.Creator.Empty() {
+		return types.ErrFactDoesNotExist("Fact does not exist").Result()
+	}
+	//check if the address is voted on this fact before, if no, return an error
+	if !keeper.HasVoteOnFact(ctx, msg.Title, msg.Voter) {
+		return types.ErrVoteDoesNotExist("Vote does not exist").Result()
+	}
+
+	vote := keeper.GetVoteOnFact(ctx, msg.Title, msg.Voter)
+	//Remove the address stored in upvoters/downvoters
+	if vote.Upvote {
+		fact.Upvoters = RemoveIndex(fact.Upvoters, msg.Voter)
+	} else if !vote.Upvote {
+		fact.Downvoters = RemoveIndex(fact.Downvoters, msg.Voter)
+	}
+	keeper.SetFact(ctx, fact)
+	//delete the vote on Fact obeject
+	keeper.DeleteVoteOnFact(ctx, msg.Title, msg.Voter)
+	return sdk.Result{}
 }

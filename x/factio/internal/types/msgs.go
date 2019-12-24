@@ -282,9 +282,8 @@ func (msg MsgVoteFact) GetSigners() []sdk.AccAddress {
 
 // MsgUnVoteFact defines a Vote Fact Message
 type MsgUnVoteFact struct {
-	Title  string         `json:"title"`
-	Voter  sdk.AccAddress `json:"voter"`
-	UpVote bool           `json:"upvote"`
+	Title string         `json:"title"`
+	Voter sdk.AccAddress `json:"voter"`
 }
 
 // NewMsgUnVoteFact is a constructor function for MsgUnVoteFact

@@ -176,6 +176,13 @@ func (k Keeper) SetVoteOnFact(ctx sdk.Context, voteOnFact types.VoteOnFact) {
 	store.Set(key, k.cdc.MustMarshalBinaryBare(voteOnFact))
 }
 
+// Deletes the entire VoteOnFact metadata struct
+func (k Keeper) DeleteVoteOnFact(ctx sdk.Context, title string, voter sdk.AccAddress) {
+	store := ctx.KVStore(k.storeKey)
+	key := append(types.FactDelegateKey, (voter.String() + title)...)
+	store.Delete([]byte(key))
+}
+
 // function to get a vote power object
 func (k Keeper) GetVotePower(ctx sdk.Context, voter sdk.AccAddress) types.VotePower {
 	store := ctx.KVStore(k.storeKey)
