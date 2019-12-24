@@ -4,12 +4,12 @@ import (
 	"strings"
 )
 
-// QueryResFactDelegationList is a list of title that address that has been delegated to it
-type QueryResFactDelegationList []string
+// QueryResVotedList is a list of title that address that has been voted to it
+type QueryResVotedList []VoteOnFact
 
 // implement fmt.Stringer
-func (r QueryResFactDelegationList) String() string {
-	return strings.Join(r[:], "\n")
+func (r QueryResVotedList) String() string {
+	return (r[0].Title)
 }
 
 type QueryResFactList []string

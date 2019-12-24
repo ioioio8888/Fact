@@ -26,8 +26,8 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	factioTxCmd.AddCommand(client.PostCommands(
 		GetCmdCreateFact(cdc),
 		GetCmdEditFact(cdc),
-		GetCmdDelegateFact(cdc),
-		GetCmdUnDelegateFact(cdc),
+		// GetCmdDelegateFact(cdc),
+		// GetCmdUnDelegateFact(cdc),
 		GetCmdVoteFact(cdc),
 		GetCmdUnVoteFact(cdc),
 	)...)
@@ -83,49 +83,6 @@ func GetCmdEditFact(cdc *codec.Codec) *cobra.Command {
 			}
 			msg := types.NewMsgEditFact(args[0], cliCtx.GetFromAddress(), time, args[2], args[3])
 			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
-			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
-		},
-	}
-}
-
-// GetCmdDelegateFact is the CLI command for sending a DelegateFact transaction
-func GetCmdDelegateFact(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "delegate-fact [title]",
-		Short: "delegate on a fact",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-
-			msg := types.NewMsgDelegateFact(args[0], cliCtx.GetFromAddress())
-			err := msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
-			// return utils.CompleteAndBroadcastTxCLI(txBldr, cliCtx, msgs)
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
-		},
-	}
-}
-
-// GetCmdUnDelegateFact is the CLI command for sending a UnDelegateFact transaction
-func GetCmdUnDelegateFact(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "undelegate-fact [title]",
-		Short: "undelegate on a fact",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			txBldr := auth.NewTxBuilderFromCLI().WithTxEncoder(utils.GetTxEncoder(cdc))
-			msg := types.NewMsgUnDelegateFact(args[0], cliCtx.GetFromAddress())
-			err := msg.ValidateBasic()
 			if err != nil {
 				return err
 			}

@@ -42,28 +42,6 @@ func NewFact() Fact {
 	}
 }
 
-//Fact Delegation struct
-type FactDelegation struct {
-	Delegator sdk.AccAddress `json:"delegator"`
-	Title     string         `json:"title"`
-	Shares    sdk.Coins      `json:"shares"`
-}
-
-// NewDelegation creates a new delegation object
-func NewDelegation() FactDelegation {
-	return FactDelegation{}
-}
-
-//Fact Delegation struct
-type FactDelegationList struct {
-	Delegations []FactDelegation `json:"delegations"`
-}
-
-// NewDelegation creates a new delegation object
-func NewDelegationList() FactDelegationList {
-	return FactDelegationList{}
-}
-
 type VotePower struct {
 	Voter sdk.AccAddress `json:"voter"`
 	Power sdk.Dec        `json:"power"`

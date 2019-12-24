@@ -15,8 +15,6 @@ func init() {
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgCreateFact{}, "factio/CreateFact", nil)
 	cdc.RegisterConcrete(MsgEditFact{}, "factio/EditFact", nil)
-	cdc.RegisterConcrete(MsgDelegateFact{}, "factio/DelegateFact", nil)
-	cdc.RegisterConcrete(MsgUnDelegateFact{}, "factio/UndelegateFact", nil)
 	cdc.RegisterConcrete(MsgVoteFact{}, "factio/VoteFact", nil)
 	cdc.RegisterConcrete(MsgUnVoteFact{}, "factio/UnvoteFact", nil)
 }

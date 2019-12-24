@@ -16,11 +16,8 @@ const (
 func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router, storeName string) {
 	r.HandleFunc(fmt.Sprintf("/%s/factlist", storeName), getFactListHandler(cliCtx, storeName)).Methods("GET")
 	r.HandleFunc(fmt.Sprintf("/%s/{%s}/getFact", storeName, restName), getFactHandler(cliCtx, storeName)).Methods("GET")
-	r.HandleFunc(fmt.Sprintf("/%s/{%s}/getAddressDelegation", storeName, restName), getAddressDelegationHandler(cliCtx, storeName)).Methods("GET")
 
 	r.HandleFunc(fmt.Sprintf("/%s/createfact", storeName), CreateFactHandler(cliCtx)).Methods("POST")
 	r.HandleFunc(fmt.Sprintf("/%s/editfact", storeName), EditFactHandler(cliCtx)).Methods("PUT")
-	r.HandleFunc(fmt.Sprintf("/%s/delegatefact", storeName), DelegateFactHandler(cliCtx)).Methods("POST")
-	r.HandleFunc(fmt.Sprintf("/%s/undelegatefact", storeName), DelegateFactHandler(cliCtx)).Methods("POST")
 
 }

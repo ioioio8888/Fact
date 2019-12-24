@@ -12,11 +12,11 @@ import (
 
 // query endpoints supported by the factio Querier
 const (
-	QueryFact              = "getFact"
-	QueryAddressDelegation = "getAddressDelegation"
-	QueryFactList          = "getFactList"
-	QueryAccountCoins      = "getAccCoins"
-	QueryVotePower         = "getVotePower"
+	QueryFact         = "getFact"
+	QueryFactList     = "getFactList"
+	QueryAccountCoins = "getAccCoins"
+	QueryVotePower    = "getVotePower"
+	QueryVotedList    = "getVoteList"
 )
 
 // NewQuerier is the module level router for state queries
@@ -25,14 +25,14 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		switch path[0] {
 		case QueryFact:
 			return queryFact(ctx, path[1:], req, keeper)
-		case QueryAddressDelegation:
-			return queryAddressDelegation(ctx, path[1:], req, keeper)
 		case QueryFactList:
 			return queryFactList(ctx, req, keeper)
 		case QueryAccountCoins:
 			return queryAccountCoins(ctx, path[1:], req, keeper)
 		case QueryVotePower:
 			return queryVotePower(ctx, path[1:], req, keeper)
+		case QueryVotedList:
+			return queryVotedList(ctx, path[1:], req, keeper)
 		default:
 			return nil, sdk.ErrUnknownRequest("unknown factio query endpoint")
 		}
@@ -49,25 +49,6 @@ func queryFact(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Kee
 	fact := keeper.GetFact(ctx, path[0])
 
 	res, err := codec.MarshalJSONIndent(keeper.cdc, fact)
-	if err != nil {
-		panic("could not marshal result to JSON")
-	}
-
-	return res, nil
-}
-
-// return a list of title that the address has delegated to it
-func queryAddressDelegation(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
-
-	var factDelegationList types.QueryResFactDelegationList
-	iterator := keeper.GetFactDelegationIterator(ctx, path[0])
-
-	for ; iterator.Valid(); iterator.Next() {
-		var out types.FactDelegation
-		keeper.cdc.UnmarshalBinaryBare(iterator.Value(), &out)
-		factDelegationList = append(factDelegationList, out.Title)
-	}
-	res, err := codec.MarshalJSONIndent(keeper.cdc, factDelegationList)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
@@ -109,7 +90,7 @@ func queryAccountCoins(ctx sdk.Context, path []string, req abci.RequestQuery, ke
 	return res, nil
 }
 
-// return an account's coins
+// return an account's vote power
 func queryVotePower(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
 	var votePower types.VotePower
 	address, aerr := sdk.AccAddressFromBech32(path[0])
@@ -118,6 +99,24 @@ func queryVotePower(ctx sdk.Context, path []string, req abci.RequestQuery, keepe
 	}
 	votePower = keeper.GetVotePower(ctx, address)
 	res, err := codec.MarshalJSONIndent(keeper.cdc, votePower)
+	if err != nil {
+		panic("could not marshal result to JSON")
+	}
+
+	return res, nil
+}
+
+// return a list of account's voted fact
+func queryVotedList(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, sdk.Error) {
+	var votedList types.QueryResVotedList
+	iterator := keeper.GetVoteOnFactIterator(ctx, path[0])
+
+	for ; iterator.Valid(); iterator.Next() {
+		var out types.VoteOnFact
+		keeper.cdc.UnmarshalBinaryBare(iterator.Value(), &out)
+		votedList = append(votedList, out)
+	}
+	res, err := codec.MarshalJSONIndent(keeper.cdc, votedList)
 	if err != nil {
 		panic("could not marshal result to JSON")
 	}
